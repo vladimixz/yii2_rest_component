@@ -1,6 +1,7 @@
 # yii2_rest_component
 yii2 rest component
 in params config
+````
 'salt' => '',
 'apiAuthCredentials' => [
     'facebook' => [
@@ -13,3 +14,4 @@ in params config
         'consumerSecret' => '',
     ],
 ],
+````
