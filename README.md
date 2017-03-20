@@ -14,5 +14,6 @@ in params config
         'consumerKey' => '',
         'consumerSecret' => '',
     ],
+    'jwtExp' => 60*60*24*30 //month
 ],
 ````

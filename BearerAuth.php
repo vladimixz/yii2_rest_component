@@ -143,22 +143,27 @@ class BearerAuth extends HttpBearerAuth
         if (isset($this->authData['token'])) {
             $identity = User::find()->where(['token' => $this->authData['token']])->one();
             $decodedToken = $this->decodeToken($this->authData['token']);
-            if ($decodedToken->user != $identity['email']) {
-                $this->handleFailure('Invalid authorization token!');
+            if (!$decodedToken){
+                $this->handleFailure('Token was expired or it was corrupted!');
+            } elseif ($decodedToken->user != $identity['email']) {
+                $this->handleFailure('Invalid token!');
             }
         } else {
             $identity = User::find()->where(['email' => $this->authData['email']])->one();
-            if ($identity && isset($this->authData['password'])) {
-                $validatePassword = Yii::$app->getSecurity()->validatePassword(
-                    $this->authData['password'], $identity->getAttribute('password')
-                );
-                if (!$validatePassword) {
-                    $this->handleFailure('Invalid password!');
+            if ($identity) {
+                if (isset($this->authData['password'])) {
+                    $validatePassword = Yii::$app->getSecurity()->validatePassword(
+                        $this->authData['password'], $identity->getAttribute('password')
+                    );
+                    if (!$validatePassword) {
+                        $this->handleFailure('Invalid password!');
+                    }
                 }
-            }
-            if ($identity && !$identity->getAttribute('token') && $this->currentAction == $this->loginAction) {
-                $identity->setAttribute('token', $this->getJWT($identity->getAttribute('email')));
-                $identity->save();
+                $decodedToken = $this->decodeToken($identity->getAttribute('token'));
+                if (!$decodedToken) {
+                    $identity->setAttribute('token', $this->getJWT($identity->getAttribute('email')));
+                    $identity->save();
+                }
             }
         }
         return $identity;
@@ -170,22 +175,24 @@ class BearerAuth extends HttpBearerAuth
      */
     public function getJWT($email)
     {
-        return JWT::encode(['user' => $email], Yii::$app->params['salt']);
+        $params = ['user' => $email];
+        if (isset(Yii::$app->params['apiAuthCredentials']['jwtExp'])) {
+            $params['exp'] = time() + Yii::$app->params['apiAuthCredentials']['jwtExp'];
+        }
+        return JWT::encode($params, Yii::$app->params['salt']);
     }
 
     /**
      * @param $token
-     * @param bool $bool
      * @return bool|object
      */
-    public function decodeToken($token, $bool = false)
+    public function decodeToken($token)
     {
-        $result = false;
         try {
             $decoded = JWT::decode($token, Yii::$app->params['salt'], ['HS256']);
-            $result = $bool ? true : $decoded;
+            $result = $decoded;
         } catch (UnexpectedValueException $e) {
-            $this->handleFailure('Invalid Authorization token!');
+            $result = false;
         }
         return $result;
     }
@@ -237,7 +244,7 @@ class BearerAuth extends HttpBearerAuth
         unset($user['id']);
         unset($user['name']);
         if (!isset($user['email'])) {
-            $this->handleFailure('Twitter email not found in OAUTH response!');
+            $this->handleFailure('Please provide an access to your Facebook account!');
         }
         return $user;
     }
