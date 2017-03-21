@@ -53,6 +53,7 @@ class BearerAuth extends HttpBearerAuth
     }
 
     /**
+     * Get Auth gata
      * @return bool|mixed|string
      */
     public function getAuthData()
