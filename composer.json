@@ -1,0 +1,14 @@
+{
+    "name": "vladimixz/yii2-rest-component",
+    "description": "Simple component for creating rest api auth",
+    "type": "component",
+    "license": "GNU General Public License v2.0",
+    "authors": [
+        {
+            "name": "vladimixz",
+            "email": "vladimirperepelitsa101@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
