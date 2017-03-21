@@ -38,11 +38,18 @@ class BearerAuth extends HttpBearerAuth
     /**
      * @inheritdoc
      */
-    public function init()
+    public function authenticate($user, $request, $response)
     {
         $this->currentAction = Yii::$app->controller->action->id;
         $this->authData = $this->getAuthData();
-        parent::init();
+        $identity = $this->getIdentity();
+        if ($identity !== null && Yii::$app->user->login($identity)) {
+            return Yii::$app->user->identity;
+        } else {
+            $this->handleFailure('Your request was made with invalid credentials.');
+        }
+
+        return null;
     }
 
     /**
@@ -84,22 +91,6 @@ class BearerAuth extends HttpBearerAuth
     {
         $method = Yii::$app->request->method == 'GET' ? 'get' : 'post';
         return Yii::$app->request->$method($param);
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function authenticate($user, $request, $response)
-    {
-        $identity = $this->getIdentity();
-        if ($identity !== null && Yii::$app->user->login($identity)) {
-            return Yii::$app->user->identity;
-        } else {
-            $this->handleFailure('Your request was made with invalid credentials.');
-        }
-
-        return null;
     }
 
     /**
