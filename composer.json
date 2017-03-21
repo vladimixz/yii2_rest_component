@@ -9,6 +9,13 @@
             "email": "vladimirperepelitsa101@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
-    "require": {}
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Vladimixz\\BearerAuth\\": "src"
+        }
+    },
+    "minimum-stability": "stable",
 }
