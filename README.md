@@ -1,7 +1,7 @@
 # yii2_rest_component
 yii2 rest component
 
-in params config
+Add this to params.php config
 ````
 'salt' => '',
 'apiAuthCredentials' => [
@@ -16,4 +16,20 @@ in params config
     ],
     'jwtExp' => 60*60*24*30 //month
 ],
+````
+
+In controller you can use component in behaviour as authenticator
+````
+/**
+ * @inheritdoc
+ */
+public function behaviors () {
+    return [
+        'authenticator' => [
+            'registerAction' => 'register',
+            'loginAction' => 'login',
+            'class' => BearerAuth::className(),
+        ]
+    ];
+}
 ````
