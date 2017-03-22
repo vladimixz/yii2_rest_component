@@ -2,7 +2,6 @@
 
 namespace vladimixz;
 
-use app\models\User;
 use Yii;
 use yii\filters\auth\HttpBearerAuth;
 use yii\base\ExitException;
