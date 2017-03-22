@@ -3,7 +3,7 @@
     "description": "Simple component for creating rest api auth",
     "type": "component",
     "license": "GNU General Public License v2.0",
-    "homepage": "https://github.com/vladimixz/yii2_rest_component",
+    "version": "1.0.0",
     "authors": [
         {
             "name": "vladimixz",
