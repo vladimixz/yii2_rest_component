@@ -14,7 +14,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Vladimixz\\BearerAuth\\": "src"
+            "vladimixz": "src"
         }
     },
     "minimum-stability": "stable"

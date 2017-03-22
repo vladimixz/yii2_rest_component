@@ -1,6 +1,6 @@
 <?php
 
-namespace Vladimixz\BearerAuth;
+namespace vladimixz;
 
 use app\models\User;
 use Yii;
