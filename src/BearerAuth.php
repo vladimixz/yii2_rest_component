@@ -10,6 +10,7 @@ use Facebook\Exceptions;
 use Firebase\JWT\JWT;
 use UnexpectedValueException;
 use Abraham\TwitterOAuth\TwitterOAuth;
+use DomainException;
 
 
 /**
@@ -185,6 +186,8 @@ class BearerAuth extends HttpBearerAuth
             $decoded = JWT::decode($token, Yii::$app->params['salt'], ['HS256']);
             $result = $decoded;
         } catch (UnexpectedValueException $e) {
+            $result = false;
+        } catch (DomainException $e) {
             $result = false;
         }
         return $result;
