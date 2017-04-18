@@ -21,7 +21,10 @@
         }
     },
     "scripts": {
-        "create-tables": [
+        "post-update-cmd": [
+            "cd ../../../ && php yii migrate --migrationPath=@vendor/vladimixz/yii2-rest-component/migrations"
+        ],
+        "post-install-cmd": [
             "cd ../../../ && php yii migrate --migrationPath=@vendor/vladimixz/yii2-rest-component/migrations"
         ]
     },
