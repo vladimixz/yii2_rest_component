@@ -10,12 +10,20 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0"
+        "php": ">=5.3.0",
+        "firebase/php-jwt": "^4.0",
+        "facebook/graph-sdk" : "~5.0",
+        "abraham/twitteroauth": "~0.7.2"
     },
     "autoload": {
         "psr-4": {
             "vladimixz\\": "src"
         }
+    },
+    "scripts": {
+        "create-tables": [
+            "cd ../../../ && php yii migrate --migrationPath=@vendor/vladimixz/yii2-rest-component/migrations"
+        ]
     },
     "minimum-stability": "stable"
 }
