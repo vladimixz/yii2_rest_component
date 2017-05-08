@@ -22,7 +22,7 @@
     },
     "scripts": {
         "migrations": [
-            "cd ../../../ && php yii migrate --migrationPath=@vendor/vladimixz/yii2-rest-component/migrations"
+            "cd ../../../ && echo 'y' | php yii migrate --migrationPath=@vendor/vladimixz/yii2-rest-component/migrations"
         ]
     },
     "minimum-stability": "stable"
