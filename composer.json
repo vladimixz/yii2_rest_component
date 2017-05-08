@@ -21,10 +21,10 @@
         }
     },
     "scripts": {
-        "post-update-cmd": [
+        "post-package-update": [
             "cd ../../../ && php yii migrate --migrationPath=@vendor/vladimixz/yii2-rest-component/migrations"
         ],
-        "post-install-cmd": [
+        "post-package-install": [
             "cd ../../../ && php yii migrate --migrationPath=@vendor/vladimixz/yii2-rest-component/migrations"
         ]
     },
