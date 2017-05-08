@@ -2,8 +2,10 @@
 yii2 rest component
 
 In terminal go to project folder and run
+````
 php composer.phar vladimixz/yii2-rest-component
 php composer.phar run-script migrations -d ./vendor/vladimixz/yii2-rest-component/
+````
 
 Add this to params.php config
 ````
