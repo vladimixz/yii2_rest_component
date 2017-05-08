@@ -22,19 +22,19 @@
     },
     "scripts": {
         "post-update-cmd": [
-            "install.sh"
+            "yii\\composer\\Installer::postCreateProject"
         ],
         "post-package-install": [
-            "install.sh"
+            "yii\\composer\\Installer::postCreateProject"
         ],
         "post-install-cmd": [
-            "install.sh"
+            "yii\\composer\\Installer::postCreateProject"
         ],
         "post-autoload-dump": [
-            "install.sh"
+            "yii\\composer\\Installer::postCreateProject"
         ],
         "post-create-project-cmd": [
-            "install.sh"
+            "yii\\composer\\Installer::postCreateProject"
         ]
     },
     "minimum-stability": "stable"
