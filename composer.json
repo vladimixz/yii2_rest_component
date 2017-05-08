@@ -21,20 +21,8 @@
         }
     },
     "scripts": {
-        "post-update-cmd": [
-            "yii\\composer\\Installer::postCreateProject"
-        ],
-        "post-package-install": [
-            "yii\\composer\\Installer::postCreateProject"
-        ],
-        "post-install-cmd": [
-            "yii\\composer\\Installer::postCreateProject"
-        ],
-        "post-autoload-dump": [
-            "yii\\composer\\Installer::postCreateProject"
-        ],
-        "post-create-project-cmd": [
-            "yii\\composer\\Installer::postCreateProject"
+        "migrations": [
+            "cd ../../../ && php yii migrate --migrationPath=@vendor/vladimixz/yii2-rest-component/migrations"
         ]
     },
     "minimum-stability": "stable"
