@@ -21,11 +21,20 @@
         }
     },
     "scripts": {
-        "post-package-update": [
-            "cd ../../../ && php yii migrate --migrationPath=@vendor/vladimixz/yii2-rest-component/migrations"
+        "post-update-cmd": [
+            "install.sh"
         ],
         "post-package-install": [
-            "cd ../../../ && php yii migrate --migrationPath=@vendor/vladimixz/yii2-rest-component/migrations"
+            "install.sh"
+        ],
+        "post-install-cmd": [
+            "install.sh"
+        ],
+        "post-autoload-dump": [
+            "install.sh"
+        ],
+        "post-create-project-cmd": [
+            "install.sh"
         ]
     },
     "minimum-stability": "stable"
