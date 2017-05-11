@@ -1,15 +1,8 @@
 # yii2_rest_component
 yii2 rest component
 
-In terminal go to project folder and run
-````
-php composer.phar require vladimixz/yii2-rest-component
-php composer.phar run-script migrations -d ./vendor/vladimixz/yii2-rest-component/
-````
-
 Add this to params.php config
 ````
-'salt' => '',
 'apiAuthCredentials' => [
     'facebook' => [
         'default_graph_version' => 'v2.8',
@@ -20,8 +13,18 @@ Add this to params.php config
         'consumerKey' => '',
         'consumerSecret' => '',
     ],
+    'tables' => [
+        'users' => 'users',
+        'userDevices' => 'userDevices'
+    ],
     'jwtExp' => 60*60*24*30 //month
 ],
+````
+
+In terminal go to project folder and run
+````
+php composer.phar require vladimixz/yii2-rest-component
+php composer.phar run-script install -d ./vendor/vladimixz/yii2-rest-component/
 ````
 
 In controller you can use component in behaviour as authenticator
@@ -35,6 +38,7 @@ public function behaviors () {
             'registerAction' => 'register',
             'loginAction' => 'login',
             'class' => BearerAuth::className(),
+            'except' => []
         ]
     ];
 }

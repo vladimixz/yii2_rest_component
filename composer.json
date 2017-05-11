@@ -21,8 +21,8 @@
         }
     },
     "scripts": {
-        "migrations": [
-            "cd ../../../ && echo 'y' | php yii migrate --migrationPath=@vendor/vladimixz/yii2-rest-component/migrations"
+        "install": [
+            "cd ../../../ && echo 'y' | php yii migrate --migrationPath=@vendor/vladimixz/yii2-rest-component/src/migrations"
         ]
     },
     "minimum-stability": "stable"
