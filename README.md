@@ -3,6 +3,7 @@ yii2 rest component
 
 Add this to params.php config
 ````
+'salt' => ''
 'apiAuthCredentials' => [
     'facebook' => [
         'default_graph_version' => 'v2.8',
@@ -14,11 +15,18 @@ Add this to params.php config
         'consumerSecret' => '',
     ],
     'tables' => [
-        'users' => 'users',
-        'userDevices' => 'userDevices'
+        'users' => '',
+        'userDevices' => ''
     ],
     'jwtExp' => 60*60*24*30 //month
 ],
+````
+
+Add JSON parser to your web config
+````
+'parsers' => [
+    'application/json' => 'yii\web\JsonParser',
+]
 ````
 
 In terminal go to project folder and run

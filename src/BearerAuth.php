@@ -14,17 +14,16 @@ use DomainException;
 
 
 /**
- *
+ * Component for authorization and authentication users via facebook, twitter, email/password
+ * Based on JWT component
  * @property void $auth
  * @property void|string $identity
  */
 class BearerAuth extends HttpBearerAuth
 {
 
-    public $realm = 'api';
     public $registerAction;
     public $loginAction;
-    public $facebookCredentials;
 
     public $authData;
     public $currentAction;
@@ -36,6 +35,7 @@ class BearerAuth extends HttpBearerAuth
     ];
 
     /**
+     * Authenticate user, method called in controller before action
      * @inheritdoc
      */
     public function authenticate($user, $request, $response)
@@ -46,14 +46,14 @@ class BearerAuth extends HttpBearerAuth
         if ($identity !== null && Yii::$app->user->login($identity)) {
             return Yii::$app->user->identity;
         } else {
-            $this->handleFailure('Your request was made with invalid credentials.');
+            $this->handleFailure('Your request was made with invalid credentials.', 401);
         }
 
         return null;
     }
 
     /**
-     * Get Auth gata
+     * Get Auth data
      * @return bool|mixed|string
      */
     public function getAuthData()
@@ -68,12 +68,13 @@ class BearerAuth extends HttpBearerAuth
         } elseif (count($headersOverall) === 0 && $this->request('email') && $this->request('password')) {
             $authFunction = $this->headerAuth['email-authorization'];
         } else {
-            $this->handleFailure('Please specify email and password for auth!');
+            $this->handleFailure('Please specify email and password for auth!', 400);
         }
         return $this->$authFunction();
     }
 
     /**
+     * Return error with status code
      * @inheritdoc
      */
     public function handleFailure($message, $code = null)
@@ -85,6 +86,7 @@ class BearerAuth extends HttpBearerAuth
     }
 
     /**
+     * Return request data of GET or POST
      * @param null $param
      * @return mixed
      */
@@ -95,7 +97,8 @@ class BearerAuth extends HttpBearerAuth
     }
 
     /**
-     * @return User|array|null|\yii\db\ActiveRecord
+     * Create new (if action is register) or find exist identity
+     * @return User|array|null|\yii\db\ActiveRecord|\yii\web\IdentityInterface
      */
     public function getIdentity()
     {
@@ -109,13 +112,14 @@ class BearerAuth extends HttpBearerAuth
     }
 
     /**
-     * @return User
+     * Create new identity, only for register action
+     * @return \yii\db\ActiveRecord User
      */
     public function createIdentity()
     {
         $identityClass = Yii::$app->user->identityClass;
+        /* @var $identity \yii\db\ActiveRecord */
         $identity = new $identityClass();
-        $identity->setScenario($identityClass::SCENARIO_REGISTER);
         $identity->setAttributes($this->request());
         $identity->setAttributes($this->authData);
         $identity->setAttribute('token', $this->getJWT($identity->email));
@@ -123,24 +127,26 @@ class BearerAuth extends HttpBearerAuth
             $identity->setAttribute('password', Yii::$app->getSecurity()->generateRandomString());
         }
         if (!$identity->save()) {
-            $this->handleFailure($identity->getErrors());
+            $this->handleFailure($identity->getErrors(), 400);
         }
         return $identity;
     }
 
     /**
+     * Find exist identity
      * @return array|null|\yii\db\ActiveRecord
      */
     public function findIdentity()
     {
         $identityClass = Yii::$app->user->identityClass;
+        /* @var $identity \yii\db\ActiveRecord */
         if (isset($this->authData['token'])) {
             $identity = $identityClass::find()->where(['token' => $this->authData['token']])->one();
             $decodedToken = $this->decodeToken($this->authData['token']);
             if (!$decodedToken){
-                $this->handleFailure('Token was expired or it was corrupted!');
+                $this->handleFailure('Token was expired or it was corrupted!', 401);
             } elseif ($decodedToken->user != $identity['email']) {
-                $this->handleFailure('Invalid token!');
+                $this->handleFailure('Invalid token!', 401);
             }
         } else {
             $identity = $identityClass::find()->where(['email' => $this->authData['email']])->one();
@@ -150,7 +156,7 @@ class BearerAuth extends HttpBearerAuth
                         $this->authData['password'], $identity->getAttribute('password')
                     );
                     if (!$validatePassword) {
-                        $this->handleFailure('Invalid password!');
+                        $this->handleFailure('Invalid password!', 401);
                     }
                 }
                 $decodedToken = $this->decodeToken($identity->getAttribute('token'));
@@ -164,6 +170,7 @@ class BearerAuth extends HttpBearerAuth
     }
 
     /**
+     * Create JWT token for identity
      * @param $email
      * @return string
      */
@@ -177,6 +184,7 @@ class BearerAuth extends HttpBearerAuth
     }
 
     /**
+     * Decode token
      * @param $token
      * @return bool|object
      */
@@ -194,17 +202,19 @@ class BearerAuth extends HttpBearerAuth
     }
 
     /**
+     * Auth function for authorization via JWT token
      * @return array
      */
     public function authorization()
     {
         if ($this->currentAction == $this->registerAction) {
-            $this->handleFailure('You can`t register new user by token');
+            $this->handleFailure('You can`t register new user by token', 400);
         }
         return ['token' => Yii::$app->request->getHeaders()->get('Authorization')];
     }
 
     /**
+     * Auth function for authorization or registration via email/password token
      * @return array
      */
     public function emailAuthorization()
@@ -214,6 +224,7 @@ class BearerAuth extends HttpBearerAuth
     }
 
     /**
+     * Auth function for authorization or registration via facebook
      * @return array
      */
     public function facebookAuthorization()
@@ -227,9 +238,9 @@ class BearerAuth extends HttpBearerAuth
                 Yii::$app->request->getHeaders()->get('facebook-authorization')
             );
         } catch(Exceptions\FacebookResponseException $e) {
-            $this->handleFailure($e->getMessage());
+            $this->handleFailure($e->getMessage(), 400);
         } catch(Exceptions\FacebookSDKException $e) {
-            $this->handleFailure($e->getMessage());
+            $this->handleFailure($e->getMessage(), 400);
         }
         $user = $response->getGraphUser()->asArray();
         if ($response->getGraphUser()->getBirthday()) {
@@ -240,12 +251,13 @@ class BearerAuth extends HttpBearerAuth
         unset($user['id']);
         unset($user['name']);
         if (!isset($user['email'])) {
-            $this->handleFailure('Please provide an access to your Facebook account!');
+            $this->handleFailure('Please provide an access to your Facebook account!', 401);
         }
         return $user;
     }
 
     /**
+     * Auth function for authorization or registration via twitter
      * @return array
      */
     public function twitterAuthorization()
@@ -267,19 +279,19 @@ class BearerAuth extends HttpBearerAuth
         }
         if (!isset($user['email'])) {
             Yii::info('Twitter email not found in response!');
-            $this->handleFailure('Unable to sign in with your twitter credentials');
+            $this->handleFailure('Unable to sign in with your twitter credentials', 401);
         }
         $user = ['twitterId' => (string) $user['id'], 'email' => $user['email'], 'fullName' => $user['name']];
         return $user;
     }
 
     /**
-     *
+     * Check opportunity login or register with given credentials
      */
     public function checkAuthOpportunity()
     {
         if ($this->currentAction != $this->registerAction && $this->currentAction != $this->loginAction) {
-            $this->handleFailure('Invalid Auth credentials, use token!');
+            $this->handleFailure('Invalid Auth credentials, use token!', 400);
         }
     }
 
