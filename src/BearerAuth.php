@@ -122,7 +122,7 @@ class BearerAuth extends HttpBearerAuth
         $identity = new $identityClass();
         $identity->setAttributes($this->request());
         $identity->setAttributes($this->authData);
-        $identity->setAttribute('token', $this->getJWT($identity->email));
+        $identity->setAttribute('token', $this->getJWT($identity->getAttribute('email')));
         if (!isset($identity->password)) {
             $identity->setAttribute('password', Yii::$app->getSecurity()->generateRandomString());
         }
@@ -138,10 +138,10 @@ class BearerAuth extends HttpBearerAuth
      */
     public function findIdentity()
     {
-        $identityClass = Yii::$app->user->identityClass;
+        $identityFind = call_user_func([Yii::$app->user->identityClass, 'find']);
         /* @var $identity \yii\db\ActiveRecord */
         if (isset($this->authData['token'])) {
-            $identity = $identityClass::find()->where(['token' => $this->authData['token']])->one();
+            $identity = $identityFind->where(['token' => $this->authData['token']])->one();
             $decodedToken = $this->decodeToken($this->authData['token']);
             if (!$decodedToken){
                 $this->handleFailure('Token was expired or it was corrupted!', 401);
@@ -149,7 +149,7 @@ class BearerAuth extends HttpBearerAuth
                 $this->handleFailure('Invalid token!', 401);
             }
         } else {
-            $identity = $identityClass::find()->where(['email' => $this->authData['email']])->one();
+            $identity = $identityFind->where(['email' => $this->authData['email']])->one();
             if ($identity) {
                 if (isset($this->authData['password'])) {
                     $validatePassword = Yii::$app->getSecurity()->validatePassword(
