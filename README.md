@@ -16,7 +16,7 @@ Add this to params.php config
     ],
     'tables' => [
         'users' => '',
-        'userDevices' => ''
+        'userDevice' => ''
     ],
     'jwtExp' => 60*60*24*30 //month
 ],
