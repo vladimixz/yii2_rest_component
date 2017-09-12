@@ -17,7 +17,7 @@ class m170418_145419_users extends Migration
     public function init()
     {
         $this->columns = [
-            "users" => [
+            "user" => [
                 "id" => $this->primaryKey(),
                 "fullName" => $this->string(255),
                 "email" => $this->string(255)->null(),
@@ -43,7 +43,7 @@ class m170418_145419_users extends Migration
     }
 
     /**
-     * Create users and devices tables with names from config
+     * Create user and devices tables with names from config
      */
     public function up()
     {

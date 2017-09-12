@@ -15,7 +15,7 @@ Add this to params.php config
         'consumerSecret' => '',
     ],
     'tables' => [
-        'users' => '',
+        'user' => '',
         'userDevice' => ''
     ],
     'jwtExp' => 60*60*24*30 //month
