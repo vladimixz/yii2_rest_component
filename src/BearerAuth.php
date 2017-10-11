@@ -107,6 +107,9 @@ class BearerAuth extends HttpBearerAuth
             $identity = $this->createIdentity();
         } else {
             $identity = $this->findIdentity();
+            if(empty($identity) && !empty($this->authData['facebookId']) || !empty($this->authData['twitterId'])) {
+                $identity = $this->createIdentity();
+            }
         }
         return $identity;
     }
@@ -234,7 +237,7 @@ class BearerAuth extends HttpBearerAuth
         $response = [];
         try {
             $response = $fb->get(
-                '/me?fields=id,name,birthday,email',
+                '/me?fields=id,name,birthday,email,first_name,last_name',
                 Yii::$app->request->getHeaders()->get('facebook-authorization')
             );
         } catch(Exceptions\FacebookResponseException $e) {
@@ -247,7 +250,11 @@ class BearerAuth extends HttpBearerAuth
             $user['birthday'] = $response->getGraphUser()->getBirthday()->format('Y-m-d');
         }
         $user['fullName'] = $user['name'];
+        $user['firstName'] = $user['first_name'];
+        $user['lastName'] = $user['last_name'];
         $user['facebookId'] = $user['id'];
+        unset($user['first_name']);
+        unset($user['last_name']);
         unset($user['id']);
         unset($user['name']);
         if (!isset($user['email'])) {
@@ -281,7 +288,10 @@ class BearerAuth extends HttpBearerAuth
             Yii::info('Twitter email not found in response!');
             $this->handleFailure('Unable to sign in with your twitter credentials', 401);
         }
-        $user = ['twitterId' => (string) $user['id'], 'email' => $user['email'], 'fullName' => $user['name']];
+        $fullName = preg_split('/ /', trim($user['name']), 2);
+        $firstName = (!empty($fullName[0])) ? $fullName[0] : '';
+        $lastName = (!empty($fullName[1])) ? $fullName[1] : '';
+        $user = ['twitterId' => (string) $user['id'], 'email' => $user['email'], 'fullName' => $user['name'], 'firstName' => $firstName, 'lastName' => $lastName];
         return $user;
     }
 
