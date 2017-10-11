@@ -20,6 +20,8 @@ class m170418_145419_users extends Migration
             "user" => [
                 "id" => $this->primaryKey(),
                 "fullName" => $this->string(255),
+                "firstName" => $this->string(255),
+                "lastName" => $this->string(255),
                 "email" => $this->string(255)->null(),
                 "password" => $this->string(255)->null(),
                 "facebookId" => $this->string(32)->null(),
