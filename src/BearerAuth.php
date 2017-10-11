@@ -107,9 +107,6 @@ class BearerAuth extends HttpBearerAuth
             $identity = $this->createIdentity();
         } else {
             $identity = $this->findIdentity();
-            if(empty($identity) && !empty($this->authData['facebookId']) || !empty($this->authData['twitterId'])) {
-                $identity = $this->createIdentity();
-            }
         }
         return $identity;
     }
@@ -167,6 +164,8 @@ class BearerAuth extends HttpBearerAuth
                     $identity->setAttribute('token', $this->getJWT($identity->getAttribute('email')));
                     $identity->save();
                 }
+            } elseif(!empty($this->authData['facebookId']) || !empty($this->authData['twitterId'])) {
+                $identity = $this->createIdentity();
             }
         }
         return $identity;
