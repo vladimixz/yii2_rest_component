@@ -73,7 +73,7 @@ class m170418_145419_users extends Migration
     {
         foreach ($columns as $name => $type) {
             if (!isset($table->columns[$name])) {
-                $this->addColumn($table, $name, $type);
+                $this->addColumn($table->name, $name, $type);
             }
         }
     }
